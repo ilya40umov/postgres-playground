@@ -172,3 +172,9 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# files containing sensitive data
+pgadmin4/servers.json
+
+# Vim temp files
+*.swp
