@@ -8,12 +8,13 @@ services:
     shm_size: 128mb
     env_file: ".env"
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready" ]
+      test: [ "CMD-SHELL", "pg_isready -U $POSTGRES_USER'" ]
       interval: 15s
       timeout: 30s
       retries: 3
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./postgres/initdb.d/:/docker-entrypoint-initdb.d
 
   pgadmin:
     image: dpage/pgadmin4

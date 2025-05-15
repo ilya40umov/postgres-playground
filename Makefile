@@ -16,7 +16,7 @@ help:
 	@test -f .env || ./bin/create-env-file.sh
 
 pgadmin4/servers.json: .env
-	$(EXPORT_ENV_VARS) envsubst < pgadmin4/servers.template.json > pgadmin4/servers.json
+	@$(EXPORT_ENV_VARS) envsubst < pgadmin4/servers.template.json > pgadmin4/servers.json
 
 .PHONY: .config-files
 
@@ -57,4 +57,4 @@ tail-pgadmin:
 
 # Usage: make psql
 psql: .env
-	$(EXPORT_ENV_VARS) docker compose exec -u $$POSTGRES_USER postgres psql
+	@$(EXPORT_ENV_VARS) docker compose exec -u $$POSTGRES_USER postgres psql
