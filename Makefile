@@ -4,7 +4,18 @@ else
 	SHELL := bash
 endif
 
-EXPORT_ENV_VARS := set -a && source .env && set +a &&
+venv_dir := .venv
+ifeq ($(OS),Windows_NT)
+	activate_venv := source $(venv_dir)/Scripts/activate
+	python_cmd := python3.12.exe
+else
+	activate_venv := source $(venv_dir)/bin/activate
+	python_cmd := python3.12
+endif
+
+export_env_vars := set -a && source .env && set +a &&
+
+v := 1
 
 .PHONY: help
 
@@ -16,7 +27,7 @@ help:
 	@test -f .env || ./bin/create-env-file.sh
 
 pgadmin4/servers.json: .env
-	@$(EXPORT_ENV_VARS) envsubst < pgadmin4/servers.template.json > pgadmin4/servers.json
+	@$(export_env_vars) envsubst < pgadmin4/servers.template.json > pgadmin4/servers.json
 
 .PHONY: .config-files
 
@@ -57,4 +68,22 @@ tail-pgadmin:
 
 # Usage: make psql
 psql: .env
-	@$(EXPORT_ENV_VARS) docker compose exec -u $$POSTGRES_USER postgres psql
+	@$(export_env_vars) docker compose exec -u $$POSTGRES_USER postgres psql
+
+.PHONY: venv black
+
+# Usage: make venv
+venv:
+	@test -z "$$VIRTUAL_ENV" || ( echo "venv already active"; exit 1 )
+	$(python_cmd) -m venv $(venv_dir)
+	$(activate_venv) && pip install --require-virtualenv -r requirements.txt
+
+# Usage: black
+black:
+	$(activate_venv) && black .
+
+.PHONY: topup
+
+# Usage: topup [v=1]
+topup:
+	python wallet/topup_v$(v).py

@@ -15,8 +15,7 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "wallet" <<-EOSQL
       created TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
     );
 
-    INSERT INTO account (name)
-    VALUES ('User A'), ('User B'), ('User C');
+    CREATE UNIQUE INDEX account_name_idx ON account (name);
 
     -- wallet table --
 
@@ -29,46 +28,4 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "wallet" <<-EOSQL
     );
  
     CREATE UNIQUE INDEX wallet_account_idx ON wallet (account_id);
-
-    WITH initial_data AS (
-      SELECT
-        account_id,
-        '1000.0'::numeric as balance
-      FROM account
-    )
-    INSERT INTO wallet (account_id, balance) 
-    SELECT * FROM initial_data;
-
-    -- topup_log table --
-
-    CREATE TABLE topup_log (
-      topup_log_id SERIAL PRIMARY KEY,
-      wallet_id INTEGER NOT NULL REFERENCES wallet (wallet_id),
-      amount NUMERIC(10, 2),
-      created TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
-    );
-
-    CREATE INDEX topup_log_wallet_idx ON topup_log (wallet_id);
-
-    WITH initial_data AS (
-      SELECT
-        wallet_id,
-        balance as amount
-      FROM wallet
-    )
-    INSERT INTO topup_log (wallet_id, amount)
-    SELECT * FROM initial_data;
-
-    -- transfer_log table --
-
-    CREATE TABLE transfer_log (
-      transfer_log_id SERIAL PRIMARY KEY,
-      from_wallet_id INTEGER NOT NULL REFERENCES wallet (wallet_id),
-      to_wallet_id INTEGER NOT NULL REFERENCES wallet (wallet_id),
-      amount NUMERIC(10, 2),
-      created TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
-    );
-
-    CREATE INDEX transfer_log_from_wallet_idx ON transfer_log (from_wallet_id);
-    CREATE INDEX transfer_log_to_wallet_idx ON transfer_log (to_wallet_id);
 EOSQL
