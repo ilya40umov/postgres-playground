@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 
 _dotenv_loaded = False
 
+
 def get_connection() -> connection:
     global _dotenv_loaded
     if not _dotenv_loaded:

@@ -38,11 +38,11 @@ def topup_v5(conn, task: TopupTask):
                     ),
                 )
 
-            break;
+            break
         except SerializationFailure:
-            pass # retrying
+            pass  # retrying
         except InFailedSqlTransaction:
-            conn.rollback() # retrying
+            conn.rollback()  # retrying
 
     conn.commit()
 
