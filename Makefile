@@ -54,21 +54,21 @@ up: .config-files
 down: .config-files
 	docker compose down -v
 
-.PHONY: tail-postgres tail-pgadmin
+.PHONY: tail-log
 
-# Usage: make tail-postgres
-tail-postgres:
+# Usage: make tail-log
+tail-log:
 	docker compose logs postgres -f
 
-# Usage: make tail-pgadmin
-tail-pgadmin:
-	docker compose logs pgadmin -f
-
-.PHONY: psql
+.PHONY: psql ssh
 
 # Usage: make psql
 psql: .env
 	@$(export_env_vars) docker compose exec -u $$POSTGRES_USER postgres psql
+
+# Usage: make ssh
+ssh: .env
+	@$(export_env_vars) docker compose exec -u $$POSTGRES_USER postgres bash
 
 .PHONY: venv black
 
@@ -82,8 +82,12 @@ venv:
 black:
 	$(activate_venv) && black .
 
-.PHONY: topup
+.PHONY: topup-wallet generate-feedback
 
-# Usage: topup [v=1]
-topup:
-	python wallet/topup_v$(v).py
+# Usage: topup-wallet [v=1]
+topup-wallet:
+	$(activate_venv) && python wallet/topup_v$(v).py
+
+# Usage: generate-feedback
+generate-feedback:
+	$(activate_venv) && python feedback/generate.py
