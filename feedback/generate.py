@@ -64,9 +64,9 @@ def main():
             {
                 "name": f"{fake.prefix()} {fake.name()} {random.randint(1, 1000)}",
                 "banned_from": [
-                    random.randint(1, len(businesses)), 
                     random.randint(1, len(businesses)),
-                    random.randint(1, len(businesses))
+                    random.randint(1, len(businesses)),
+                    random.randint(1, len(businesses)),
                 ],
                 "registered": fake.date_time_this_decade(),
             }
@@ -91,7 +91,7 @@ def main():
                     "message": fake.paragraph(nb_sentences=5),
                     "last_edited": fake.date_time_this_decade(
                         businesses[business_id - 1]["registered"],
-                        customers[customer_id - 1]["registered"]
+                        customers[customer_id - 1]["registered"],
                     ),
                 }
             )
