@@ -7,7 +7,7 @@ endif
 venv_dir := .venv
 ifeq ($(OS),Windows_NT)
 	activate_venv := source $(venv_dir)/Scripts/activate
-	python_cmd := python3.12.exe
+	python_cmd := python.exe
 else
 	activate_venv := source $(venv_dir)/bin/activate
 	python_cmd := python3.12
@@ -70,7 +70,7 @@ psql: .env
 ssh: .env
 	@$(export_env_vars) docker compose exec -u $$POSTGRES_USER postgres bash
 
-.PHONY: venv black
+.PHONY: venv .venv-exists black
 
 # Usage: make venv
 venv:
@@ -78,16 +78,19 @@ venv:
 	$(python_cmd) -m venv $(venv_dir)
 	$(activate_venv) && pip install --require-virtualenv -r requirements.txt
 
+.venv-exists:
+	@test -f .venv || ( echo "create venv first"; exit 1 )
+
 # Usage: black
-black:
+black: .venv-exists
 	$(activate_venv) && black .
 
 .PHONY: topup-wallet generate-feedback
 
 # Usage: topup-wallet [v=1]
-topup-wallet:
+topup-wallet: .venv-exists
 	$(activate_venv) && python wallet/topup_v$(v).py
 
 # Usage: generate-feedback
-generate-feedback:
+generate-feedback: .venv-exists
 	$(activate_venv) && python feedback/generate.py
