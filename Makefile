@@ -60,14 +60,14 @@ down: .config-files
 tail-log:
 	docker compose logs postgres -f
 
-.PHONY: psql ssh
+.PHONY: psql shell
 
 # Usage: make psql
 psql: .env
 	@$(export_env_vars) docker compose exec -u $$POSTGRES_USER postgres psql
 
-# Usage: make ssh
-ssh: .env
+# Usage: make shell
+shell: .env
 	@$(export_env_vars) docker compose exec -u $$POSTGRES_USER postgres bash
 
 .PHONY: venv .venv-exists black
@@ -79,13 +79,13 @@ venv:
 	$(activate_venv) && pip install --require-virtualenv -r requirements.txt
 
 .venv-exists:
-	@test -f .venv || ( echo "create venv first"; exit 1 )
+	@test -d .venv || ( echo "create venv first"; exit 1 )
 
 # Usage: black
 black: .venv-exists
 	$(activate_venv) && black .
 
-.PHONY: topup-wallet generate-feedback
+.PHONY: topup-wallet generate-feedback jupyter-notebook
 
 # Usage: topup-wallet [v=1]
 topup-wallet: .venv-exists
@@ -94,3 +94,7 @@ topup-wallet: .venv-exists
 # Usage: generate-feedback
 generate-feedback: .venv-exists
 	$(activate_venv) && python feedback/generate.py
+
+# Usage: jupyter-notebook
+jupyter-notebook: .venv-exists
+	$(activate_venv) && jupyter notebook feedback/queries.ipynb

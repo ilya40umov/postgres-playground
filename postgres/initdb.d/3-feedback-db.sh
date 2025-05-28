@@ -18,10 +18,6 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "feedback" <<-EOSQL
       registered   TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
  
-    CREATE INDEX business_name_idx ON business USING HASH (name) WHERE active;
-    CREATE INDEX business_description_idx ON business USING HASH (description) WHERE active;
-    CREATE INDEX business_location_idx ON business USING GIST (ll_to_earth(lat, lon)) WHERE active;
-
     -- customer table --
 
     CREATE TABLE customer (
@@ -30,9 +26,6 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "feedback" <<-EOSQL
       banned_from  INTEGER[] DEFAULT '{}',
       registered   TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
-
-    CREATE INDEX customer_name_idx ON customer USING BTREE (name);
-    CREATE INDEX customer_banned_from_idx ON customer USING GIN (banned_from);
 
     -- feedback table --
 
@@ -44,7 +37,4 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "feedback" <<-EOSQL
       last_edited  TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
  
-    CREATE INDEX feedback_business_idx ON feedback USING BTREE (business_id);
-    CREATE INDEX feedback_customer_idx ON feedback USING BTREE (customer_id);
-    CREATE INDEX feedback_last_edited_idx ON feedback USING BRIN (last_edited);
 EOSQL

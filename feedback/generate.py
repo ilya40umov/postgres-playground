@@ -18,6 +18,9 @@ def insert_in_bulk(conn, records, query):
 def main():
     print("Initializing...")
 
+    num_of_businesses = 10000
+    num_of_customers = 20000
+
     load_dotenv()
 
     fake = faker.Faker()
@@ -37,7 +40,7 @@ def main():
 
     print("Generating businesses...")
     businesses = []
-    for i in range(0, 5000):
+    for i in range(0, num_of_businesses):
         loc = fake.local_latlng(country_code="US", coords_only=True)
         businesses.append(
             {
@@ -59,14 +62,14 @@ def main():
 
     print("Generating customers...")
     customers = []
-    for i in range(0, 10000):
+    for i in range(0, num_of_customers):
         customers.append(
             {
                 "name": f"{fake.prefix()} {fake.name()} {random.randint(1, 1000)}",
                 "banned_from": [
-                    random.randint(1, len(businesses)),
-                    random.randint(1, len(businesses)),
-                    random.randint(1, len(businesses)),
+                    random.randint(1, num_of_businesses),
+                    random.randint(1, num_of_businesses),
+                    random.randint(1, num_of_businesses),
                 ],
                 "registered": fake.date_time_this_decade(),
             }
@@ -81,14 +84,15 @@ def main():
 
     print("Generating feedback...")
     feedbacks = []
-    for business_id in range(1, len(businesses) + 1):
-        for i in range(0, random.randint(1, 11)):
-            customer_id = random.randint(1, len(customers))
+    for business_id in range(1, num_of_businesses + 1):
+        for i in range(0, random.randint(1, 15)):
+            customer_id = random.randint(1, num_of_customers)
+            n_sentences = 5 if business_id % 100 != 0 else 100
             feedbacks.append(
                 {
                     "business_id": business_id,
                     "customer_id": customer_id,
-                    "message": fake.paragraph(nb_sentences=5),
+                    "message": fake.paragraph(nb_sentences=n_sentences),
                     "last_edited": fake.date_time_this_decade(
                         businesses[business_id - 1]["registered"],
                         customers[customer_id - 1]["registered"],

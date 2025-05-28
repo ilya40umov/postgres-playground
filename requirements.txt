@@ -1,4 +1,7 @@
-psycopg2-binary
 python-dotenv
-black
+psycopg2-binary
+sqlalchemy
 Faker
+notebook
+pandas
+black
